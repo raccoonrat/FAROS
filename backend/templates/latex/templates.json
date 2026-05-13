@@ -1,0 +1,37 @@
+[
+  {
+    "id": "icml",
+    "name": "ICML 2025",
+    "description": "Official-style ICML 2025 LaTeX draft template",
+    "sections": ["Introduction", "Related Work", "Method", "Experiments", "Analysis", "Conclusion"],
+    "bibStyle": "icml2025"
+  },
+  {
+    "id": "neurips",
+    "name": "NeurIPS 2025",
+    "description": "Official-style NeurIPS 2025 LaTeX draft template",
+    "sections": ["Introduction", "Related Work", "Background", "Method", "Experiments", "Ablations", "Conclusion"],
+    "bibStyle": "plainnat"
+  },
+  {
+    "id": "iclr",
+    "name": "ICLR 2025",
+    "description": "Official-style ICLR 2025 LaTeX draft template",
+    "sections": ["Introduction", "Related Work", "Preliminaries", "Method", "Experiments", "Conclusion"],
+    "bibStyle": "iclr2025_conference"
+  },
+  {
+    "id": "acl",
+    "name": "ACL",
+    "description": "Official ACL proceedings LaTeX draft template",
+    "sections": ["Introduction", "Related Work", "Task Definition", "Methodology", "Experiments", "Error Analysis", "Conclusion"],
+    "bibStyle": "acl_natbib"
+  },
+  {
+    "id": "generic",
+    "name": "Generic LaTeX",
+    "description": "Clean fallback article template",
+    "sections": ["Introduction", "Related Work", "Method", "Experiments", "Results", "Conclusion"],
+    "bibStyle": "plainnat"
+  }
+]

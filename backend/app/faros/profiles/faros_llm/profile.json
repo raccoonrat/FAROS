@@ -1,0 +1,34 @@
+{
+  "id": "faros_llm",
+  "name": "FAROS-LLM",
+  "version": "0.1.0",
+  "description": "LLM-backed FAROS profile using the existing provider settings and module implementations.",
+  "capability_bindings": {
+    "idea_refinement": {
+      "provider_type": "llm",
+      "provider": "minimax",
+      "model": "MiniMax-M2.5",
+      "options": {}
+    },
+    "paper_drafting": {
+      "provider_type": "llm",
+      "provider": "minimax",
+      "model": "MiniMax-M2.5",
+      "options": {}
+    },
+    "reviewer_simulation": {
+      "provider_type": "llm",
+      "provider": "minimax",
+      "model": "MiniMax-M2.5",
+      "options": {}
+    }
+  },
+  "defaults": {
+    "paperType": "algorithm",
+    "targetVenue": "generic",
+    "reviewerProfile": "senior_reviewer"
+  },
+  "verification_policy": {
+    "mode": "baseline"
+  }
+}

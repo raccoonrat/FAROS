@@ -1,0 +1,306 @@
+/**
+ * Design System Tokens - LLM-Scientist Platform
+ * Scientific Precision meets Modern Lab aesthetic
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* ============================================================================
+   * Typography Scale
+   * Display: DM Serif Display (serif, elegant)
+   * Heading: DM Sans (geometric, modern)
+   * Body: Inter (refined, readable)
+   * Mono: JetBrains Mono
+   * ========================================================================== */
+  --font-display: 'DM Serif Display', 'Playfair Display', ui-serif, Georgia, serif;
+  --font-heading: 'DM Sans', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Font sizes - modular scale (1.25 ratio) */
+  --text-xs: 0.75rem;
+  /* 12px */
+  --text-sm: 0.875rem;
+  /* 14px */
+  --text-base: 1rem;
+  /* 16px */
+  --text-lg: 1.125rem;
+  /* 18px */
+  --text-xl: 1.25rem;
+  /* 20px */
+  --text-2xl: 1.5rem;
+  /* 24px */
+  --text-3xl: 1.875rem;
+  /* 30px */
+  --text-4xl: 2.25rem;
+  /* 36px */
+  --text-5xl: 3rem;
+  /* 48px */
+
+  /* Line heights */
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+
+  /* Font weights */
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* ============================================================================
+   * Spacing Scale - 8px grid system
+   * ========================================================================== */
+  --space-0: 0;
+  --space-1: 0.25rem;
+  /* 4px */
+  --space-2: 0.5rem;
+  /* 8px */
+  --space-3: 0.75rem;
+  /* 12px */
+  --space-4: 1rem;
+  /* 16px */
+  --space-5: 1.25rem;
+  /* 20px */
+  --space-6: 1.5rem;
+  /* 24px */
+  --space-8: 2rem;
+  /* 32px */
+  --space-10: 2.5rem;
+  /* 40px */
+  --space-12: 3rem;
+  /* 48px */
+  --space-16: 4rem;
+  /* 64px */
+  --space-20: 5rem;
+  /* 80px */
+  --space-24: 6rem;
+  /* 96px */
+
+  /* Container widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+
+  /* ============================================================================
+   * Color System - Scientific Lab Theme
+   * Light mode: warm whites + deep navy accents
+   * Dark mode: deep slate + cyan accents
+   * ========================================================================== */
+
+  /* Light Mode Colors */
+  --color-bg-light: hsl(210, 20%, 98%);
+  /* Warm off-white */
+  --color-surface-light: hsl(0, 0%, 100%);
+  /* Pure white */
+  --color-surface-elevated-light: hsl(0, 0%, 100%);
+  --color-surface-inset-light: hsl(210, 20%, 96%);
+
+  --color-border-light: hsl(214, 15%, 91%);
+  /* Soft gray border */
+  --color-border-strong-light: hsl(214, 15%, 85%);
+
+  --color-text-primary-light: hsl(215, 25%, 15%);
+  /* Deep navy text */
+  --color-text-secondary-light: hsl(215, 15%, 45%);
+  --color-text-tertiary-light: hsl(215, 10%, 60%);
+  --color-text-inverse-light: hsl(0, 0%, 100%);
+
+  --color-primary-light: hsl(195, 85%, 45%);
+  /* Scientific cyan */
+  --color-primary-hover-light: hsl(195, 85%, 40%);
+  --color-primary-subtle-light: hsl(195, 85%, 95%);
+
+  --color-success-light: hsl(142, 71%, 45%);
+  --color-success-subtle-light: hsl(142, 71%, 95%);
+
+  --color-warning-light: hsl(38, 92%, 50%);
+  --color-warning-subtle-light: hsl(38, 92%, 95%);
+
+  --color-danger-light: hsl(0, 84%, 60%);
+  --color-danger-subtle-light: hsl(0, 84%, 95%);
+
+  /* Dark Mode Colors */
+  --color-bg-dark: hsl(215, 28%, 10%);
+  /* Deep slate */
+  --color-surface-dark: hsl(215, 25%, 14%);
+  /* Elevated slate */
+  --color-surface-elevated-dark: hsl(215, 25%, 18%);
+  --color-surface-inset-dark: hsl(215, 28%, 8%);
+
+  --color-border-dark: hsl(215, 20%, 25%);
+  --color-border-strong-dark: hsl(215, 20%, 35%);
+
+  --color-text-primary-dark: hsl(210, 20%, 95%);
+  --color-text-secondary-dark: hsl(210, 15%, 70%);
+  --color-text-tertiary-dark: hsl(210, 10%, 55%);
+  --color-text-inverse-dark: hsl(215, 28%, 10%);
+
+  --color-primary-dark: hsl(185, 80%, 55%);
+  /* Bright cyan */
+  --color-primary-hover-dark: hsl(185, 80%, 60%);
+  --color-primary-subtle-dark: hsl(185, 80%, 15%);
+
+  --color-success-dark: hsl(142, 71%, 50%);
+  --color-success-subtle-dark: hsl(142, 71%, 15%);
+
+  --color-warning-dark: hsl(38, 92%, 55%);
+  --color-warning-subtle-dark: hsl(38, 92%, 15%);
+
+  --color-danger-dark: hsl(0, 84%, 65%);
+  --color-danger-subtle-dark: hsl(0, 84%, 15%);
+
+  /* ============================================================================
+   * Semantic Color Mappings (Light Mode Default)
+   * ========================================================================== */
+  --color-bg: var(--color-bg-light);
+  --color-surface: var(--color-surface-light);
+  --color-surface-elevated: var(--color-surface-elevated-light);
+  --color-surface-inset: var(--color-surface-inset-light);
+
+  --color-border: var(--color-border-light);
+  --color-border-strong: var(--color-border-strong-light);
+
+  --color-text-primary: var(--color-text-primary-light);
+  --color-text-secondary: var(--color-text-secondary-light);
+  --color-text-tertiary: var(--color-text-tertiary-light);
+  --color-text-inverse: var(--color-text-inverse-light);
+
+  --color-primary: var(--color-primary-light);
+  --color-primary-hover: var(--color-primary-hover-light);
+  --color-primary-subtle: var(--color-primary-subtle-light);
+
+  --color-success: var(--color-success-light);
+  --color-success-subtle: var(--color-success-subtle-light);
+
+  --color-warning: var(--color-warning-light);
+  --color-warning-subtle: var(--color-warning-subtle-light);
+
+  --color-danger: var(--color-danger-light);
+  --color-danger-subtle: var(--color-danger-subtle-light);
+
+  /* ============================================================================
+   * Shadows - Layered depth
+   * ========================================================================== */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+
+  /* ============================================================================
+   * Border Radius
+   * ========================================================================== */
+  --radius-sm: 0.25rem;
+  /* 4px */
+  --radius-md: 0.375rem;
+  /* 6px */
+  --radius-lg: 0.5rem;
+  /* 8px */
+  --radius-xl: 0.75rem;
+  /* 12px */
+  --radius-2xl: 1rem;
+  /* 16px */
+  --radius-full: 9999px;
+
+  /* ============================================================================
+   * Focus Ring
+   * ========================================================================== */
+  --focus-ring: 0 0 0 3px var(--color-primary-subtle);
+  --focus-ring-offset: 2px;
+
+  /* ============================================================================
+   * Motion - Durations & Easings
+   * ========================================================================== */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+  --duration-slower: 500ms;
+
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ============================================================================
+   * Gradients - Subtle backgrounds
+   * ========================================================================== */
+  --gradient-subtle: linear-gradient(135deg,
+      hsl(210, 20%, 98%) 0%,
+      hsl(195, 30%, 97%) 100%);
+
+  --gradient-mesh: radial-gradient(at 0% 0%,
+      hsla(195, 85%, 95%, 0.3) 0px,
+      transparent 50%),
+    radial-gradient(at 100% 100%,
+      hsla(215, 85%, 95%, 0.2) 0px,
+      transparent 50%);
+}
+
+/* ============================================================================
+ * Dark Mode Overrides
+ * ========================================================================== */
+.dark {
+  --color-bg: var(--color-bg-dark);
+  --color-surface: var(--color-surface-dark);
+  --color-surface-elevated: var(--color-surface-elevated-dark);
+  --color-surface-inset: var(--color-surface-inset-dark);
+
+  --color-border: var(--color-border-dark);
+  --color-border-strong: var(--color-border-strong-dark);
+
+  --color-text-primary: var(--color-text-primary-dark);
+  --color-text-secondary: var(--color-text-secondary-dark);
+  --color-text-tertiary: var(--color-text-tertiary-dark);
+  --color-text-inverse: var(--color-text-inverse-dark);
+
+  --color-primary: var(--color-primary-dark);
+  --color-primary-hover: var(--color-primary-hover-dark);
+  --color-primary-subtle: var(--color-primary-subtle-dark);
+
+  --color-success: var(--color-success-dark);
+  --color-success-subtle: var(--color-success-subtle-dark);
+
+  --color-warning: var(--color-warning-dark);
+  --color-warning-subtle: var(--color-warning-subtle-dark);
+
+  --color-danger: var(--color-danger-dark);
+  --color-danger-subtle: var(--color-danger-subtle-dark);
+
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.6);
+
+  --gradient-subtle: linear-gradient(135deg,
+      hsl(215, 28%, 10%) 0%,
+      hsl(215, 28%, 12%) 100%);
+
+  --gradient-mesh: radial-gradient(at 0% 0%,
+      hsla(185, 80%, 25%, 0.15) 0px,
+      transparent 50%),
+    radial-gradient(at 100% 100%,
+      hsla(215, 80%, 25%, 0.1) 0px,
+      transparent 50%);
+}
+
+/* ============================================================================
+ * Reduced Motion Support
+ * ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+    --duration-slower: 0ms;
+  }
+}

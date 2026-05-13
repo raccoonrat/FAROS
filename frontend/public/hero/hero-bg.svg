@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Soft paper-like base -->
+    <linearGradient id="base" x1="0" y1="0" x2="0" y2="1080" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F7F8FA"/>
+      <stop offset="0.55" stop-color="#F3F5F7"/>
+      <stop offset="1" stop-color="#EEF2F6"/>
+    </linearGradient>
+
+    <!-- Gentle scientific glow -->
+    <radialGradient id="glow1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1280 320) rotate(90) scale(520 820)">
+      <stop offset="0" stop-color="#22D3EE" stop-opacity="0.14"/>
+      <stop offset="0.6" stop-color="#0EA5A4" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#0EA5A4" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="glow2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(640 760) rotate(90) scale(480 740)">
+      <stop offset="0" stop-color="#6366F1" stop-opacity="0.10"/>
+      <stop offset="0.65" stop-color="#6366F1" stop-opacity="0.03"/>
+      <stop offset="1" stop-color="#6366F1" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Subtle noise -->
+    <filter id="noise" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+      <feColorMatrix type="matrix" values="
+        1 0 0 0 0
+        0 1 0 0 0
+        0 0 1 0 0
+        0 0 0 0.06 0" />
+    </filter>
+
+    <!-- Soft blur for distant shapes -->
+    <filter id="softBlur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+
+    <!-- Thin line style -->
+    <linearGradient id="line" x1="240" y1="260" x2="1640" y2="860" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0F172A" stop-opacity="0.10"/>
+      <stop offset="0.5" stop-color="#0EA5A4" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#0F172A" stop-opacity="0.10"/>
+    </linearGradient>
+
+    <linearGradient id="line2" x1="280" y1="900" x2="1500" y2="220" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0F172A" stop-opacity="0.08"/>
+      <stop offset="0.5" stop-color="#6366F1" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#0F172A" stop-opacity="0.08"/>
+    </linearGradient>
+
+    <!-- Node glow -->
+    <filter id="nodeGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Very faint grid -->
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M 64 0 L 0 0 0 64" fill="none" stroke="#0F172A" stroke-opacity="0.035" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Base -->
+  <rect width="1920" height="1080" fill="url(#base)"/>
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+
+  <!-- Glows -->
+  <circle cx="1280" cy="320" r="520" fill="url(#glow1)" filter="url(#softBlur)"/>
+  <circle cx="640" cy="760" r="480" fill="url(#glow2)" filter="url(#softBlur)"/>
+
+  <!-- Abstract scientific paths (thin, elegant) -->
+  <path d="M260 300 C520 220, 720 260, 960 360 C1180 450, 1340 420, 1600 320" stroke="url(#line)" stroke-width="2" fill="none"/>
+  <path d="M300 860 C520 760, 720 780, 960 860 C1220 950, 1380 900, 1580 820" stroke="url(#line)" stroke-width="2" fill="none"/>
+  <path d="M340 520 C540 420, 720 450, 920 520 C1120 590, 1320 600, 1540 520" stroke="url(#line2)" stroke-width="2" fill="none"/>
+
+  <!-- Secondary fine lines -->
+  <path d="M420 210 C520 360, 720 400, 920 340 C1120 280, 1320 220, 1520 260" stroke="#0F172A" stroke-opacity="0.07" stroke-width="1.5" fill="none"/>
+  <path d="M460 940 C620 820, 760 820, 920 900 C1100 990, 1300 980, 1500 880" stroke="#0F172A" stroke-opacity="0.07" stroke-width="1.5" fill="none"/>
+
+  <!-- Nodes -->
+  <g filter="url(#nodeGlow)">
+    <circle cx="260" cy="300" r="5" fill="#0EA5A4" fill-opacity="0.55"/>
+    <circle cx="520" cy="250" r="6" fill="#22D3EE" fill-opacity="0.42"/>
+    <circle cx="960" cy="360" r="6" fill="#0EA5A4" fill-opacity="0.46"/>
+    <circle cx="1340" cy="420" r="6" fill="#6366F1" fill-opacity="0.34"/>
+    <circle cx="1600" cy="320" r="5" fill="#0EA5A4" fill-opacity="0.55"/>
+
+    <circle cx="340" cy="520" r="5" fill="#6366F1" fill-opacity="0.30"/>
+    <circle cx="720" cy="470" r="6" fill="#22D3EE" fill-opacity="0.38"/>
+    <circle cx="1120" cy="590" r="6" fill="#0EA5A4" fill-opacity="0.40"/>
+    <circle cx="1540" cy="520" r="5" fill="#6366F1" fill-opacity="0.30"/>
+
+    <circle cx="300" cy="860" r="5" fill="#0EA5A4" fill-opacity="0.55"/>
+    <circle cx="720" cy="780" r="6" fill="#22D3EE" fill-opacity="0.40"/>
+    <circle cx="960" cy="860" r="6" fill="#6366F1" fill-opacity="0.30"/>
+    <circle cx="1580" cy="820" r="5" fill="#0EA5A4" fill-opacity="0.55"/>
+  </g>
+
+  <!-- Tiny annotation-like ticks (academic feel) -->
+  <g stroke="#0F172A" stroke-opacity="0.07" stroke-width="1">
+    <path d="M520 250 l18 -6"/>
+    <path d="M960 360 l18 0"/>
+    <path d="M1120 590 l18 6"/>
+    <path d="M720 780 l18 -6"/>
+  </g>
+
+  <!-- Noise overlay -->
+  <rect width="1920" height="1080" filter="url(#noise)" opacity="1"/>
+</svg>

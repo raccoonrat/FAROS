@@ -1,0 +1,26 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(14, 165, 164, 0.03)" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="glow1" cx="30%" cy="20%" r="40%">
+      <stop offset="0%" stop-color="rgba(14, 165, 164, 0.08)"/>
+      <stop offset="100%" stop-color="rgba(14, 165, 164, 0)"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="70%" cy="80%" r="35%">
+      <stop offset="0%" stop-color="rgba(34, 211, 238, 0.06)"/>
+      <stop offset="100%" stop-color="rgba(34, 211, 238, 0)"/>
+    </radialGradient>
+  </defs>
+  
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+  <ellipse cx="576" cy="216" rx="768" ry="432" fill="url(#glow1)"/>
+  <ellipse cx="1344" cy="864" rx="672" ry="378" fill="url(#glow2)"/>
+  
+  <g opacity="0.4">
+    <circle cx="480" cy="320" r="2" fill="rgba(14, 165, 164, 0.2)"/>
+    <circle cx="1200" cy="600" r="2" fill="rgba(34, 211, 238, 0.2)"/>
+    <circle cx="800" cy="800" r="2" fill="rgba(99, 102, 241, 0.2)"/>
+    <circle cx="1440" cy="240" r="2" fill="rgba(14, 165, 164, 0.2)"/>
+  </g>
+</svg>

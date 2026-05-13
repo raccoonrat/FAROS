@@ -1,0 +1,111 @@
+{
+  "id": "ml_paper",
+  "name": "ML Paper Workflow",
+  "version": "0.1.0",
+  "domain": "machine-learning",
+  "description": "A first FAROS blueprint for LLM-driven ML research workflows covering ideation, drafting, and review.",
+  "workflow": [
+    {
+      "id": "idea",
+      "capability": "idea_refinement",
+      "name": "Idea Refinement",
+      "description": "Run the existing idea pipeline and select a candidate."
+    },
+    {
+      "id": "experiment",
+      "capability": "experiment",
+      "name": "Experiment Workspace",
+      "description": "Provision a code project and experiment record for the LLM workflow."
+    },
+    {
+      "id": "paper",
+      "capability": "paper_drafting",
+      "name": "Paper Drafting",
+      "description": "Draft the paper artifact with the current paper module."
+    },
+    {
+      "id": "review",
+      "capability": "reviewer_simulation",
+      "name": "Reviewer Simulation",
+      "description": "Generate a structured peer review for the drafted paper."
+    }
+  ],
+  "edges": [
+    {
+      "from": "idea",
+      "to": "experiment"
+    },
+    {
+      "from": "experiment",
+      "to": "paper"
+    },
+    {
+      "from": "paper",
+      "to": "review"
+    }
+  ],
+  "artifact_schema": {
+    "idea_refinement": [
+      "idea_session"
+    ],
+    "paper_drafting": [
+      "paper_record",
+      "latex_project",
+      "latex_zip",
+      "paper_pdf"
+    ],
+    "reviewer_simulation": [
+      "review_report"
+    ],
+    "experiment": [
+      "code_project",
+      "experiment_record"
+    ]
+  },
+  "verification_rules": [
+    {
+      "capability": "idea_refinement",
+      "requires": [
+        "ideaSessionId",
+        "selectedCandidateId"
+      ]
+    },
+    {
+      "capability": "experiment",
+      "requires": [
+        "projectId",
+        "experimentId"
+      ]
+    },
+    {
+      "capability": "paper_drafting",
+      "requires": [
+        "paperId",
+        "paperStatus"
+      ]
+    },
+    {
+      "capability": "reviewer_simulation",
+      "requires": [
+        "reviewId",
+        "reviewStatus"
+      ]
+    }
+  ],
+  "writing_constraints": {
+    "supportedVenues": [
+      "icml",
+      "neurips",
+      "iclr",
+      "acl",
+      "generic"
+    ]
+  },
+  "output_contract": {
+    "finalArtifacts": [
+      "paper_pdf",
+      "latex_zip",
+      "review_report"
+    ]
+  }
+}

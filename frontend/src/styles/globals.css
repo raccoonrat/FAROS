@@ -1,0 +1,203 @@
+@import './design-tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light mode colors */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 210 100% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 210 40% 30%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 210 100% 45%;
+    --radius: 6px;
+  }
+
+  .dark {
+    /* Dark mode colors */
+    --background: 0 0% 8%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 210 100% 55%;
+    --primary-foreground: 0 0% 10%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 210 40% 15%;
+    --accent-foreground: 210 40% 80%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 210 100% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-muted;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/30 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/50;
+}
+
+/* Focus visible styles */
+*:focus-visible {
+  @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+}
+
+/* Transitions */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: ease-in-out;
+  transition-duration: 150ms;
+}
+
+/* ═══════════════════════════════════════════════════
+   Theme A: Modern Academic — neutral white + soft blue
+   ═══════════════════════════════════════════════════ */
+.theme-modern-academic {
+  --background: 210 20% 98%;
+  --foreground: 215 25% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 215 25% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 215 25% 15%;
+  --primary: 210 80% 52%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 20% 96%;
+  --secondary-foreground: 215 15% 25%;
+  --muted: 210 15% 95%;
+  --muted-foreground: 215 10% 45%;
+  --accent: 210 40% 94%;
+  --accent-foreground: 210 40% 30%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 100%;
+  --border: 214 15% 91%;
+  --input: 214 15% 91%;
+  --ring: 210 80% 52%;
+  --radius: 8px;
+  --font-heading: 'Inter', 'DM Sans', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+/* ═══════════════════════════════════════════════════
+   Theme B: Professional Dark Mode — #1E1E2E bg
+   ═══════════════════════════════════════════════════ */
+.theme-professional-dark {
+  --background: 240 21% 15%;
+  --foreground: 226 64% 93%;
+  --card: 240 21% 17%;
+  --card-foreground: 226 64% 93%;
+  --popover: 240 21% 17%;
+  --popover-foreground: 226 64% 93%;
+  --primary: 185 80% 50%;
+  --primary-foreground: 240 21% 10%;
+  --secondary: 240 18% 22%;
+  --secondary-foreground: 226 64% 88%;
+  --muted: 240 18% 20%;
+  --muted-foreground: 226 20% 60%;
+  --accent: 185 40% 18%;
+  --accent-foreground: 185 80% 75%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 142 76% 42%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 55%;
+  --warning-foreground: 0 0% 100%;
+  --border: 240 15% 25%;
+  --input: 240 15% 25%;
+  --ring: 185 80% 50%;
+  --radius: 6px;
+  --font-heading: 'DM Sans', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+.theme-professional-dark,
+.theme-professional-dark * {
+  color-scheme: dark;
+}
+
+/* ═══════════════════════════════════════════════════
+   Theme C: Research Lab — high contrast, serif headings
+   ═══════════════════════════════════════════════════ */
+.theme-research-lab {
+  --background: 40 20% 97%;
+  --foreground: 20 15% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 20 15% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 20 15% 12%;
+  --primary: 195 85% 40%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 40 15% 94%;
+  --secondary-foreground: 20 15% 20%;
+  --muted: 40 10% 93%;
+  --muted-foreground: 20 10% 45%;
+  --accent: 195 30% 92%;
+  --accent-foreground: 195 85% 25%;
+  --destructive: 0 84% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 100%;
+  --border: 30 10% 85%;
+  --input: 30 10% 85%;
+  --ring: 195 85% 40%;
+  --radius: 4px;
+  --font-heading: 'DM Serif Display', 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}

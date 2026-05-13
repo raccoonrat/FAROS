@@ -1,0 +1,59 @@
+\documentclass{article}
+
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+\usepackage[accepted]{icml2025}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage[capitalize,noabbrev]{cleveref}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\icmltitlerunning{%%RUNNING_TITLE%%}
+
+\begin{document}
+
+\twocolumn[
+\icmltitle{%%TITLE%%}
+
+\begin{icmlauthorlist}
+\icmlauthor{%%AUTHORS%%}{default}
+\end{icmlauthorlist}
+
+\icmlaffiliation{default}{Affiliation omitted for Auto-LLM generated draft}
+\icmlcorrespondingauthor{%%AUTHORS%%}{author@example.com}
+\icmlkeywords{Machine Learning, ICML}
+
+\vskip 0.3in
+]
+
+\printAffiliationsAndNotice{}
+
+\begin{abstract}
+%%ABSTRACT%%
+\end{abstract}
+
+%%SECTION_INPUTS%%
+
+\section*{Impact Statement}
+This draft follows the ICML 2025 accepted-paper style. Authors should replace this placeholder with a venue-appropriate impact statement before final submission.
+
+\bibliography{refs}
+\bibliographystyle{icml2025}
+
+\end{document}
