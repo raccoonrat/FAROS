@@ -7,7 +7,7 @@ import {
   CheckCircle2, XCircle, Eye, EyeOff, Zap, Loader2,
   Globe, Brain, Sparkles, Bot, Cloud, Cpu, Shield, Server,
 } from 'lucide-react'
-import { LLM_PROVIDERS, getModelsByProvider } from '@/lib/models/providers'
+import { LLM_PROVIDERS, getModelsByProvider, getModelOptionsForProvider, getProviderById } from '@/lib/models/providers'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
 
@@ -47,12 +47,44 @@ interface TestResult {
 
 type TestState = 'idle' | 'testing' | 'success' | 'error'
 
+type ProviderCard = (typeof LLM_PROVIDERS)[number] & { backend?: ProviderStatus }
+
+function buildProviderCards(backendProviders: ProviderStatus[]): ProviderCard[] {
+  if (backendProviders.length === 0) {
+    return LLM_PROVIDERS.map(fp => ({ ...fp, backend: undefined }))
+  }
+
+  const backendByName = new Map(backendProviders.map(bp => [bp.providerName, bp]))
+  const cards: ProviderCard[] = LLM_PROVIDERS
+    .filter(p => backendByName.has(p.id))
+    .map(fp => ({ ...fp, backend: backendByName.get(fp.id) }))
+
+  for (const bp of backendProviders) {
+    if (!cards.find(pc => pc.id === bp.providerName)) {
+      const staticModels = getModelsByProvider(bp.providerName)
+      cards.push({
+        id: bp.providerName,
+        name: getProviderById(bp.providerName)?.name ?? bp.providerName,
+        models: staticModels.length
+          ? staticModels
+          : bp.model
+            ? [{ id: bp.model, name: bp.model, provider: bp.providerName, contextWindow: 0 }]
+            : [],
+        backend: bp,
+      })
+    }
+  }
+
+  return cards
+}
+
 export function LLMProviders() {
   // Global state
   const [activeProvider, setActiveProvider] = useState('')
   const [activeModel, setActiveModel] = useState('')
   const [backendProviders, setBackendProviders] = useState<ProviderStatus[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   // Per-provider local state
   const [keyInputs, setKeyInputs] = useState<Record<string, string>>({})
@@ -76,15 +108,21 @@ export function LLMProviders() {
       const r = await fetch(`${API_BASE}/api/v1/providers`)
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
       const data = await r.json()
-      setActiveProvider(data.activeProvider || 'bigmodel')
+      setLoadError(null)
+      setActiveProvider(data.activeProvider || 'moonshot')
       setBackendProviders(data.providers || [])
-      // Set active model from backend
       const activeProv = (data.providers || []).find(
         (p: ProviderStatus) => p.providerName === data.activeProvider
       )
       if (activeProv?.model) setActiveModel(activeProv.model)
     } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
       console.error('Failed to load providers:', err)
+      setLoadError(
+        API_BASE
+          ? `无法连接后端 (${API_BASE}/api/v1/providers): ${message}。开发环境请清空 VITE_API_BASE_URL，改用 Vite 代理。`
+          : `无法连接后端 (/api/v1/providers): ${message}。请确认后端已启动（默认端口 8005）。`
+      )
     } finally {
       setLoading(false)
     }
@@ -171,25 +209,13 @@ export function LLMProviders() {
     }
   }, [loadProviders])
 
-  // Provider list from frontend registry (LLM_PROVIDERS) merged with backend status
-  const providerCards = LLM_PROVIDERS.filter(p =>
-    backendProviders.some(bp => bp.providerName === p.id) || ['bigmodel'].includes(p.id)
-  ).map(fp => {
-    const bp = backendProviders.find(b => b.providerName === fp.id)
-    return { ...fp, backend: bp }
-  })
-
-  // Also add any backend-only providers not in LLM_PROVIDERS
-  backendProviders.forEach(bp => {
-    if (!providerCards.find(pc => pc.id === bp.providerName)) {
-      providerCards.push({
-        id: bp.providerName,
-        name: bp.providerName,
-        models: [{ id: bp.model, name: bp.model, provider: bp.providerName, contextWindow: 0 }],
-        backend: bp,
-      })
-    }
-  })
+  // Provider list from frontend registry merged with backend status
+  const providerCards = buildProviderCards(backendProviders)
+  const activeProviderCard = providerCards.find(p => p.id === activeProvider)
+  const activeModelOptions = getModelOptionsForProvider(
+    activeProvider,
+    activeProviderCard?.backend?.model,
+  )
 
   if (loading) {
     return (
@@ -220,6 +246,12 @@ export function LLMProviders() {
           </p>
         </div>
 
+        {loadError && (
+          <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {loadError}
+          </div>
+        )}
+
         {/* ── Global Active Provider Selector ── */}
         <Card className="border-primary/30 bg-primary/5">
           <CardHeader className="pb-3">
@@ -238,7 +270,8 @@ export function LLMProviders() {
                   value={activeProvider}
                   onChange={e => {
                     const prov = e.target.value
-                    const models = getModelsByProvider(prov)
+                    const bp = backendProviders.find(p => p.providerName === prov)
+                    const models = getModelOptionsForProvider(prov, bp?.model)
                     const firstModel = models.length ? models[0].id : ''
                     handleSetActive(prov, firstModel)
                   }}
@@ -255,7 +288,7 @@ export function LLMProviders() {
                   value={activeModel}
                   onChange={e => handleSetActive(activeProvider, e.target.value)}
                 >
-                  {getModelsByProvider(activeProvider).map(m => (
+                  {activeModelOptions.map(m => (
                     <option key={m.id} value={m.id}>{m.name}</option>
                   ))}
                 </select>
@@ -273,11 +306,9 @@ export function LLMProviders() {
             const tState = testStates[prov.id] || 'idle'
             const tResult = testResults[prov.id]
             const isSaving = saving[prov.id] || false
-            const models = getModelsByProvider(prov.id)
+            const models = getModelOptionsForProvider(prov.id, bp?.model)
             const currentModel = bp?.model || models[0]?.id || ''
-            const modelOptions = models.some(m => m.id === currentModel)
-              ? models
-              : [{ id: currentModel, name: `${currentModel} (custom)`, provider: prov.id, contextWindow: 0 }, ...models]
+            const modelOptions = models
 
             return (
               <Card

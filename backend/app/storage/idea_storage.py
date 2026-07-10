@@ -8,7 +8,7 @@ Follows append-only pattern for scientific integrity.
 import json
 import os
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 
@@ -33,6 +33,21 @@ def generate_literature_id() -> str:
 def generate_candidate_id() -> str:
     """Generate unique candidate ID."""
     return f"cand_{uuid.uuid4().hex[:12]}"
+
+
+def _parse_utc_datetime(value: Any) -> Optional[datetime]:
+    """Parse stored datetimes as UTC-aware values for consistent comparisons."""
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        dt = value
+    elif isinstance(value, str):
+        dt = datetime.fromisoformat(value.replace('Z', '+00:00'))
+    else:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=UTC)
+    return dt.astimezone(UTC)
 
 
 class IdeaSessionStorage:
@@ -64,20 +79,20 @@ class IdeaSessionStorage:
         return data
     
     def _deserialize_session(self, data: Dict[str, Any]) -> IdeaSession:
-        # Convert ISO strings back to datetime
+        # Convert ISO strings back to UTC-aware datetime
         for key in ['createdAt', 'startedAt', 'endedAt']:
-            if data.get(key) and isinstance(data[key], str):
-                data[key] = datetime.fromisoformat(data[key])
+            if data.get(key) is not None:
+                data[key] = _parse_utc_datetime(data[key])
         if data.get('trace'):
-            if data['trace'].get('startedAt') and isinstance(data['trace']['startedAt'], str):
-                data['trace']['startedAt'] = datetime.fromisoformat(data['trace']['startedAt'])
-            if data['trace'].get('endedAt') and isinstance(data['trace']['endedAt'], str):
-                data['trace']['endedAt'] = datetime.fromisoformat(data['trace']['endedAt'])
+            if data['trace'].get('startedAt') is not None:
+                data['trace']['startedAt'] = _parse_utc_datetime(data['trace']['startedAt'])
+            if data['trace'].get('endedAt') is not None:
+                data['trace']['endedAt'] = _parse_utc_datetime(data['trace']['endedAt'])
             for step in data['trace'].get('steps', []):
-                if step.get('startedAt') and isinstance(step['startedAt'], str):
-                    step['startedAt'] = datetime.fromisoformat(step['startedAt'])
-                if step.get('endedAt') and isinstance(step['endedAt'], str):
-                    step['endedAt'] = datetime.fromisoformat(step['endedAt'])
+                if step.get('startedAt') is not None:
+                    step['startedAt'] = _parse_utc_datetime(step['startedAt'])
+                if step.get('endedAt') is not None:
+                    step['endedAt'] = _parse_utc_datetime(step['endedAt'])
         return IdeaSession(**data)
     
     def create(self, session: IdeaSession) -> IdeaSession:
@@ -130,7 +145,11 @@ class IdeaSessionStorage:
                     sessions.append(session)
             except Exception:
                 continue
-        return sorted(sessions, key=lambda s: s.createdAt, reverse=True)
+        return sorted(
+            sessions,
+            key=lambda s: s.createdAt or datetime.min.replace(tzinfo=UTC),
+            reverse=True,
+        )
 
 
 class LiteratureStorage:
@@ -164,8 +183,8 @@ class LiteratureStorage:
         
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        if data.get('createdAt') and isinstance(data['createdAt'], str):
-            data['createdAt'] = datetime.fromisoformat(data['createdAt'])
+        if data.get('createdAt') is not None:
+            data['createdAt'] = _parse_utc_datetime(data['createdAt'])
         return LiteratureItem(**data)
     
     def list_by_session(self, session_id: str) -> List[LiteratureItem]:
@@ -176,8 +195,8 @@ class LiteratureStorage:
                 with open(path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                 if data.get('sessionId') == session_id:
-                    if data.get('createdAt') and isinstance(data['createdAt'], str):
-                        data['createdAt'] = datetime.fromisoformat(data['createdAt'])
+                    if data.get('createdAt') is not None:
+                        data['createdAt'] = _parse_utc_datetime(data['createdAt'])
                     items.append(LiteratureItem(**data))
             except Exception:
                 continue
@@ -215,8 +234,8 @@ class CandidateStorage:
         
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        if data.get('createdAt') and isinstance(data['createdAt'], str):
-            data['createdAt'] = datetime.fromisoformat(data['createdAt'])
+        if data.get('createdAt') is not None:
+            data['createdAt'] = _parse_utc_datetime(data['createdAt'])
         return IdeaCandidate(**data)
     
     def list_by_session(self, session_id: str) -> List[IdeaCandidate]:
@@ -227,8 +246,8 @@ class CandidateStorage:
                 with open(path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                 if data.get('sessionId') == session_id:
-                    if data.get('createdAt') and isinstance(data['createdAt'], str):
-                        data['createdAt'] = datetime.fromisoformat(data['createdAt'])
+                    if data.get('createdAt') is not None:
+                        data['createdAt'] = _parse_utc_datetime(data['createdAt'])
                     candidates.append(IdeaCandidate(**data))
             except Exception:
                 continue

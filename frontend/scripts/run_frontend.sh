@@ -15,14 +15,26 @@ echo "=========================================="
 
 # Set frontend configuration
 export VITE_USE_MOCK="${VITE_USE_MOCK:-false}"
-export VITE_API_BASE_URL="${VITE_API_BASE_URL:-http://127.0.0.1:8005}"
+# Leave empty in dev so the browser uses same-origin /api and Vite proxies to the backend.
+# Direct URLs (e.g. http://127.0.0.1:8005) often fail in WSL2 / remote dev due to CORS or port forwarding.
+export VITE_API_BASE_URL="${VITE_API_BASE_URL:-}"
 export CHOKIDAR_USEPOLLING="${CHOKIDAR_USEPOLLING:-1}"
 export CHOKIDAR_INTERVAL="${CHOKIDAR_INTERVAL:-150}"
+
+PORTS_FILE="$FRONTEND_DIR/../.dev/ports.json"
+if [ -z "${BACKEND_PROXY_TARGET:-}" ] && [ -f "$PORTS_FILE" ]; then
+  BACKEND_PROXY_TARGET="$(python3 -c "import json; print(json.load(open('$PORTS_FILE'))['backend']['url'])" 2>/dev/null || true)"
+fi
+export BACKEND_PROXY_TARGET="${BACKEND_PROXY_TARGET:-http://127.0.0.1:8005}"
 
 echo ""
 echo "Configuration:"
 echo "  Use Mock API: $VITE_USE_MOCK"
-echo "  Backend URL: $VITE_API_BASE_URL"
+if [ -n "$VITE_API_BASE_URL" ]; then
+  echo "  Backend URL (browser direct): $VITE_API_BASE_URL"
+else
+  echo "  Backend URL: Vite proxy -> $BACKEND_PROXY_TARGET"
+fi
 echo "  Frontend URL: http://$FRONTEND_HOST:$FRONTEND_PORT"
 echo ""
 

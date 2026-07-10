@@ -200,6 +200,60 @@ export const LLM_PROVIDERS: ProviderInfo[] = [
     ]
   },
   {
+    id: 'bigmodel',
+    name: 'BigModel (智谱)',
+    models: [
+      {
+        id: 'glm-4.5-air',
+        name: 'GLM-4.5 Air',
+        provider: 'bigmodel',
+        contextWindow: 128000,
+        description: '轻量高效 GLM-4.5 模型'
+      },
+      {
+        id: 'glm-4.6v',
+        name: 'GLM-4.6V',
+        provider: 'bigmodel',
+        contextWindow: 128000,
+        description: 'GLM-4.6 视觉模型'
+      },
+      {
+        id: 'glm-4.7',
+        name: 'GLM-4.7',
+        provider: 'bigmodel',
+        contextWindow: 128000,
+        description: 'GLM-4.7 旗舰模型'
+      },
+      {
+        id: 'search-std',
+        name: 'Search STD',
+        provider: 'bigmodel',
+        contextWindow: 128000,
+        description: '标准搜索增强模型'
+      },
+      {
+        id: 'search-pro',
+        name: 'Search Pro',
+        provider: 'bigmodel',
+        contextWindow: 128000,
+        description: '专业搜索增强模型'
+      }
+    ]
+  },
+  {
+    id: 'kimi',
+    name: 'Kimi (月之暗面)',
+    models: [
+      {
+        id: 'kimi',
+        name: 'Kimi',
+        provider: 'kimi',
+        contextWindow: 128000,
+        description: 'Kimi 通用模型'
+      }
+    ]
+  },
+  {
     id: 'zhipu',
     name: 'Zhipu AI (智谱)',
     models: [
@@ -320,6 +374,21 @@ export function getProviderById(providerId: string): ProviderInfo | undefined {
 export function getModelsByProvider(providerId: string): ModelInfo[] {
   const provider = getProviderById(providerId)
   return provider ? provider.models : []
+}
+
+/**
+ * Merge static model list with backend-reported current model.
+ */
+export function getModelOptionsForProvider(
+  providerId: string,
+  backendModel?: string | null,
+): ModelInfo[] {
+  const models = getModelsByProvider(providerId)
+  if (!backendModel || models.some(m => m.id === backendModel)) return models
+  return [
+    { id: backendModel, name: `${backendModel} (current)`, provider: providerId, contextWindow: 0 },
+    ...models,
+  ]
 }
 
 /**
