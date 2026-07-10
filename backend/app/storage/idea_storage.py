@@ -151,6 +151,14 @@ class IdeaSessionStorage:
             reverse=True,
         )
 
+    def delete(self, session_id: str) -> bool:
+        """Delete a session file. Returns False if not found."""
+        path = self._get_session_path(session_id)
+        if not path.exists():
+            return False
+        path.unlink()
+        return True
+
 
 class LiteratureStorage:
     """Storage for literature items."""
@@ -201,6 +209,20 @@ class LiteratureStorage:
             except Exception:
                 continue
         return sorted(items, key=lambda i: i.relevanceScore, reverse=True)
+
+    def delete_by_session(self, session_id: str) -> int:
+        """Delete all literature items for a session."""
+        deleted = 0
+        for path in self.base_path.glob("lit_*.json"):
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                if data.get('sessionId') == session_id:
+                    path.unlink()
+                    deleted += 1
+            except Exception:
+                continue
+        return deleted
 
 
 class CandidateStorage:
@@ -253,6 +275,20 @@ class CandidateStorage:
                 continue
         # Sort by overall score
         return sorted(candidates, key=lambda c: c.overallScore, reverse=True)
+
+    def delete_by_session(self, session_id: str) -> int:
+        """Delete all candidates for a session."""
+        deleted = 0
+        for path in self.base_path.glob("cand_*.json"):
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                if data.get('sessionId') == session_id:
+                    path.unlink()
+                    deleted += 1
+            except Exception:
+                continue
+        return deleted
 
 
 # Global storage instances

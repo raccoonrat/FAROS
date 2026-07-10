@@ -119,6 +119,14 @@ class CandidatesResponse(BaseModel):
     total: int
 
 
+class DeleteSessionResponse(BaseModel):
+    """Response for session deletion."""
+    ok: bool = True
+    sessionId: str
+    deletedLiterature: int = 0
+    deletedCandidates: int = 0
+
+
 class SelectCandidateRequest(BaseModel):
     """Request to select a candidate."""
     candidateId: str
@@ -267,6 +275,25 @@ async def get_session(session_id: str) -> SessionResponse:
         )
     
     return _session_to_response(session)
+
+
+@router.delete(
+    "/sessions/{session_id}",
+    response_model=DeleteSessionResponse,
+    summary="Delete Idea Session",
+    description="Delete an idea session and all related literature and candidates.",
+)
+async def delete_session(session_id: str) -> DeleteSessionResponse:
+    """Delete a session and cascade-delete related data."""
+    service = get_idea_service()
+    try:
+        result = service.delete_session(session_id)
+        return DeleteSessionResponse(**result)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        )
 
 
 @router.post(

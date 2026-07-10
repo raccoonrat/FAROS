@@ -16,7 +16,8 @@ import {
   History,
   ChevronDown,
   ChevronUp,
-  FileText
+  FileText,
+  Trash2,
 } from 'lucide-react'
 import { PAPER_TYPES, getPaperTypeById } from '@/lib/models/providers'
 
@@ -126,6 +127,7 @@ export function IdeaGenerationPanel() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
   const [expandedCandidate, setExpandedCandidate] = useState<string | null>(null)
   const [expandedStep, setExpandedStep] = useState<number | null>(null)
+  const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null)
 
   useEffect(() => {
     loadSessionHistory()
@@ -268,6 +270,40 @@ export function IdeaGenerationPanel() {
     return () => clearInterval(interval)
   }, [isPolling, pollSession])
 
+  const clearActiveSession = () => {
+    setSession(null)
+    setTrace(null)
+    setCandidates([])
+    setLiterature([])
+    setCreatedPlanId(null)
+    setIsPolling(false)
+    setExpandedCandidate(null)
+    setExpandedStep(null)
+    localStorage.removeItem('idea_active_session_id')
+  }
+
+  const deleteSession = async (sessionId: string) => {
+    const target = sessionHistory.find(s => s.id === sessionId)
+    const label = target?.config.seedQuery?.slice(0, 60) || sessionId
+    if (!window.confirm(`Delete this research session?\n\n${label}`)) return
+
+    setDeletingSessionId(sessionId)
+    setError(null)
+    try {
+      const response = await fetch(`${API_BASE}/api/v1/ideas/sessions/${sessionId}`, { method: 'DELETE' })
+      if (!response.ok) {
+        const d = await response.json().catch(() => ({ detail: response.statusText }))
+        throw new Error(d.detail || `Failed: ${response.status}`)
+      }
+      if (session?.id === sessionId) clearActiveSession()
+      await loadSessionHistory()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete session')
+    } finally {
+      setDeletingSessionId(null)
+    }
+  }
+
   const selectCandidate = async (candidateId: string) => {
     if (!session?.id) return
     setError(null)
@@ -334,9 +370,21 @@ export function IdeaGenerationPanel() {
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {sessionHistory.map((s) => (
                   <div key={s.id} className={`p-2 rounded border cursor-pointer hover:bg-slate-50 ${session?.id === s.id ? 'border-amber-400 bg-amber-50' : 'border-slate-200'}`} onClick={() => loadSession(s.id)}>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <span className="text-sm font-medium truncate flex-1">{s.config.seedQuery.slice(0, 50)}{s.config.seedQuery.length > 50 ? '...' : ''}</span>
-                      <Badge className={getStatusColor(s.status)} variant="outline">{s.status}</Badge>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Badge className={getStatusColor(s.status)} variant="outline">{s.status}</Badge>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 text-muted-foreground hover:text-red-600"
+                          disabled={deletingSessionId === s.id || isPolling}
+                          onClick={(e) => { e.stopPropagation(); deleteSession(s.id) }}
+                          title="Delete session"
+                        >
+                          {deletingSessionId === s.id ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                        </Button>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                       <span>{s.id}</span><span>•</span><span>{new Date(s.createdAt).toLocaleDateString()}</span>
@@ -405,9 +453,21 @@ export function IdeaGenerationPanel() {
       {session && (
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <CardTitle className="text-lg">Session: {session.id}</CardTitle>
-              <Badge className={getStatusColor(session.status)}>{session.status}</Badge>
+              <div className="flex items-center gap-2">
+                <Badge className={getStatusColor(session.status)}>{session.status}</Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-red-600 hover:text-red-700"
+                  disabled={deletingSessionId === session.id}
+                  onClick={() => deleteSession(session.id)}
+                >
+                  {deletingSessionId === session.id ? <RefreshCw className="h-4 w-4 animate-spin mr-1" /> : <Trash2 className="h-4 w-4 mr-1" />}
+                  Delete
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>

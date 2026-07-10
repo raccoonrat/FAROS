@@ -67,6 +67,19 @@ class IdeaGenerationService:
     def list_sessions(self, status: Optional[IdeaSessionStatus] = None) -> List[IdeaSession]:
         """List all sessions."""
         return self.session_storage.list_all(status)
+
+    def delete_session(self, session_id: str) -> dict:
+        """Delete a session and all related literature/candidates."""
+        if not self.session_storage.get(session_id):
+            raise ValueError(f"Session {session_id} not found")
+        deleted_literature = self.literature_storage.delete_by_session(session_id)
+        deleted_candidates = self.candidate_storage.delete_by_session(session_id)
+        self.session_storage.delete(session_id)
+        return {
+            "sessionId": session_id,
+            "deletedLiterature": deleted_literature,
+            "deletedCandidates": deleted_candidates,
+        }
     
     def start_session(self, session_id: str) -> IdeaSession:
         """Start a session (pending -> running)."""
