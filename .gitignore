@@ -1,9 +1,11 @@
 # Python bytecode and caches
+**/__pycache__/
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+*.pyd
 
 # Test / lint / type-check caches
 .pytest_cache/
@@ -14,18 +16,28 @@ __pycache__/
 htmlcov/
 .tox/
 .nox/
+.dmypy.json
 
 # Packaging / virtual environments
 *.egg-info/
 .eggs/
 pip-wheel-metadata/
+dist/
+build/
 .venv/
 venv/
 env/
 
 # Node / frontend
 node_modules/
+frontend/dist/
 
-# Environment and logs
+# Environment, logs, and local runtime data
 .env
+.env.*
+!.env.example
+!.env.runtime.example
 *.log
+backend/data/app.db
+backend/data/provider_config.json
+backend/backend/data/
