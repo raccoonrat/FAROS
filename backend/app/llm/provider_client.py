@@ -147,6 +147,14 @@ class ProviderClient:
                 )
             except Exception as e:
                 last_error = e
+
+                # Non-retryable: the process (or litellm's thread pool) is
+                # shutting down, typically during a uvicorn --reload. Retrying
+                # only prolongs a doomed request, so fail fast.
+                if "cannot schedule new futures after shutdown" in str(e).lower():
+                    logger.warning("Provider request aborted: worker is shutting down (reload).")
+                    break
+
                 retries += 1
                 if retries <= self.settings.MAX_RETRIES:
                     backoff = self.settings.RETRY_BACKOFF * (2 ** (retries - 1))

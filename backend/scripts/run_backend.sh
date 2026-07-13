@@ -92,4 +92,6 @@ echo ""
 uvicorn app.main:app \
     --host "$BACKEND_HOST" \
     --port "$BACKEND_PORT" \
-    --reload
+    --reload \
+    --reload-exclude 'data/*' \
+    --reload-exclude 'backend/data/*'

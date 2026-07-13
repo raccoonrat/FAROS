@@ -331,29 +331,32 @@ class IdeaGenerationService:
                     search_queries = step.outputs["expandedTerms"]
                     break
         
-        # Use search service to find papers
+        # Use search service to find papers. Keep the number of external
+        # queries small and stop early once we have enough unique papers so we
+        # don't hammer slow/rate-limited external APIs (ArXiv, Semantic Scholar).
         search_service = get_search_service()
-        all_results: List[SearchResult] = []
         sources_used = []
-        
-        for query in search_queries[:3]:  # Limit to 3 queries
+        seen_titles = set()
+        unique_results = []
+
+        for query in search_queries[:2]:  # Limit to 2 queries
             try:
                 results = search_service.search(query, limit=max_papers)
-                all_results.extend(results)
                 logger.info(f"Search for '{query}' returned {len(results)} results")
             except Exception as e:
                 logger.warning(f"Search failed for '{query}': {e}")
-        
-        # Deduplicate by title
-        seen_titles = set()
-        unique_results = []
-        for result in all_results:
-            normalized = result.title.lower().strip()
-            if normalized not in seen_titles:
-                seen_titles.add(normalized)
-                unique_results.append(result)
-                if result.source not in sources_used:
-                    sources_used.append(result.source)
+                results = []
+
+            for result in results:
+                normalized = result.title.lower().strip()
+                if normalized and normalized not in seen_titles:
+                    seen_titles.add(normalized)
+                    unique_results.append(result)
+                    if result.source not in sources_used:
+                        sources_used.append(result.source)
+
+            if len(unique_results) >= max_papers:
+                break
         
         # Score and sort results
         unique_results = unique_results[:max_papers]
@@ -383,7 +386,7 @@ class IdeaGenerationService:
             self.literature_storage.create(item)
             literature_items.append(item.id)
         
-        inputs = {"seedQuery": seed, "maxPapers": max_papers, "searchQueries": search_queries[:3]}
+        inputs = {"seedQuery": seed, "maxPapers": max_papers, "searchQueries": search_queries[:2]}
         outputs = {
             "paperCount": len(literature_items),
             "paperIds": literature_items,

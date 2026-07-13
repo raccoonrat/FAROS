@@ -114,6 +114,8 @@ echo ""
 /home/guiyao/miniconda3/bin/python -m uvicorn app.main:app \
     --host "$HOST" \
     --port "$FREE_PORT" \
-    --reload &
+    --reload \
+    --reload-exclude 'data/*' \
+    --reload-exclude 'backend/data/*' &
 UVICORN_PID=$!
 wait "$UVICORN_PID"
