@@ -102,6 +102,7 @@ echo "  Port: $FREE_PORT (default was $DEFAULT_PORT)"
 echo "  Host: $HOST"
 echo "  URL:  http://$HOST:$FREE_PORT"
 echo "  Ports file: $PORTS_FILE"
+echo "  Proxy: ${LLM_PROXY:-none} (set LLM_PROXY=socks5://localhost:1080 to enable)"
 echo ""
 
 # --- Start uvicorn ---

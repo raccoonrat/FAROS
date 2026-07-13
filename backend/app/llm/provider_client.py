@@ -15,6 +15,32 @@ from app.core.settings import get_settings, ProviderConfig
 
 logger = logging.getLogger(__name__)
 
+# Avoid litellm's slow/blocked attempt to fetch the model cost map from GitHub
+# on startup (raw.githubusercontent.com is frequently unreachable). The bundled
+# local backup is sufficient for our usage. Must be set before litellm import.
+os.environ.setdefault("LITELLM_LOCAL_MODEL_COST_MAP", "True")
+
+
+def _apply_proxy_from_env() -> Optional[str]:
+    """Route outbound HTTP(S) traffic through a local proxy when configured.
+
+    Set LLM_PROXY (e.g. socks5://localhost:1080) to make litellm/httpx send
+    provider and cost-map requests through it. httpx reads the standard
+    HTTP_PROXY/HTTPS_PROXY/ALL_PROXY variables, so we populate those.
+    """
+    # An explicit LLM_PROXY takes precedence and overrides any inherited proxy
+    # vars; otherwise fall back to an existing ALL_PROXY that httpx already reads.
+    proxy = os.getenv("LLM_PROXY")
+    if proxy:
+        for var in ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY"):
+            os.environ[var] = proxy
+            os.environ[var.lower()] = proxy
+        return proxy
+    return os.getenv("ALL_PROXY")
+
+
+_ACTIVE_PROXY = _apply_proxy_from_env()
+
 
 @dataclass
 class ChatMessage:
@@ -57,6 +83,9 @@ class ProviderClient:
             import litellm  # type: ignore
             litellm.drop_params = True
             litellm.set_verbose = False
+            litellm.suppress_debug_info = True
+            if _ACTIVE_PROXY:
+                logger.info("litellm using proxy: %s", _ACTIVE_PROXY)
             return litellm
         except ImportError as e:
             raise ProviderError(
