@@ -10,17 +10,21 @@ Falls back gracefully when APIs are unavailable.
 """
 
 import logging
+import os
 import time
 import json
 import re
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
-from datetime import datetime
 import urllib.request
 import urllib.parse
 import urllib.error
 
 logger = logging.getLogger(__name__)
+
+SEMANTIC_SCHOLAR_TIMEOUT_S = int(os.getenv("SEMANTIC_SCHOLAR_TIMEOUT_S", "10"))
+ARXIV_TIMEOUT_S = int(os.getenv("ARXIV_TIMEOUT_S", "8"))
+ARXIV_BASE_URL = os.getenv("ARXIV_API_URL", "https://export.arxiv.org/api/query")
 
 
 @dataclass
@@ -52,6 +56,7 @@ class SemanticScholarSearch:
         self.api_key = api_key
         self.last_request_time = 0
         self.min_request_interval = 1.0  # Rate limiting
+        self.rate_limited = False
     
     def _rate_limit(self):
         """Ensure we don't exceed rate limits."""
@@ -62,6 +67,9 @@ class SemanticScholarSearch:
     
     def _make_request(self, endpoint: str, params: Dict[str, Any]) -> Optional[Dict]:
         """Make a request to Semantic Scholar API."""
+        if self.rate_limited:
+            return None
+
         self._rate_limit()
         
         url = f"{self.BASE_URL}/{endpoint}"
@@ -74,9 +82,11 @@ class SemanticScholarSearch:
         
         try:
             request = urllib.request.Request(full_url, headers=headers)
-            with urllib.request.urlopen(request, timeout=30) as response:
+            with urllib.request.urlopen(request, timeout=SEMANTIC_SCHOLAR_TIMEOUT_S) as response:
                 return json.loads(response.read().decode('utf-8'))
         except urllib.error.HTTPError as e:
+            if e.code == 429:
+                self.rate_limited = True
             logger.warning(f"Semantic Scholar API error: {e.code} - {e.reason}")
             return None
         except urllib.error.URLError as e:
@@ -142,11 +152,12 @@ class ArxivSearch:
     Completely free, no API key required.
     """
     
-    BASE_URL = "http://export.arxiv.org/api/query"
+    BASE_URL = ARXIV_BASE_URL
     
     def __init__(self):
         self.last_request_time = 0
-        self.min_request_interval = 3.0  # ArXiv recommends 3 second delay
+        self.min_request_interval = 1.0
+        self.disabled = False
     
     def _rate_limit(self):
         """Ensure we don't exceed rate limits."""
@@ -219,6 +230,9 @@ class ArxivSearch:
         Returns:
             List of SearchResult objects
         """
+        if self.disabled:
+            return []
+
         self._rate_limit()
         
         # Build search query
@@ -239,10 +253,11 @@ class ArxivSearch:
         
         try:
             request = urllib.request.Request(url)
-            with urllib.request.urlopen(request, timeout=30) as response:
+            with urllib.request.urlopen(request, timeout=ARXIV_TIMEOUT_S) as response:
                 xml_text = response.read().decode('utf-8')
                 return self._parse_arxiv_response(xml_text)
         except Exception as e:
+            self.disabled = True
             logger.warning(f"ArXiv search failed: {e}")
             return []
 
@@ -463,45 +478,49 @@ class SearchService:
         Returns:
             Combined list of SearchResult objects, deduplicated by title
         """
-        all_results = []
-        sources = sources or ["semantic_scholar", "arxiv", "local"]
-        
-        # Try Semantic Scholar
-        if "semantic_scholar" in sources and self.semantic_scholar:
-            try:
-                results = self.semantic_scholar.search(query, limit)
-                all_results.extend(results)
-                logger.info(f"Semantic Scholar returned {len(results)} results")
-            except Exception as e:
-                logger.warning(f"Semantic Scholar search failed: {e}")
-        
-        # Try ArXiv
-        if "arxiv" in sources and self.arxiv:
-            try:
-                results = self.arxiv.search(query, limit)
-                all_results.extend(results)
-                logger.info(f"ArXiv returned {len(results)} results")
-            except Exception as e:
-                logger.warning(f"ArXiv search failed: {e}")
-        
-        # Try local corpus
+        # Prefer fast/reliable sources first: local corpus, then Semantic
+        # Scholar, then ArXiv. Stop as soon as we have enough unique results so
+        # we avoid hitting slow/unreliable external APIs unnecessarily.
+        sources = sources or ["local", "semantic_scholar", "arxiv"]
+        target = max(limit, 1)
+
+        seen_titles = set()
+        unique_results: List[SearchResult] = []
+
+        def _add(results: List[SearchResult]) -> None:
+            for result in results:
+                normalized_title = result.title.lower().strip()
+                if normalized_title and normalized_title not in seen_titles:
+                    seen_titles.add(normalized_title)
+                    unique_results.append(result)
+
+        # Local corpus first (always fast, offline-safe)
         if "local" in sources and self.local:
             try:
                 results = self.local.search(query, limit)
-                all_results.extend(results)
+                _add(results)
                 logger.info(f"Local corpus returned {len(results)} results")
             except Exception as e:
                 logger.warning(f"Local search failed: {e}")
-        
-        # Deduplicate by normalized title
-        seen_titles = set()
-        unique_results = []
-        for result in all_results:
-            normalized_title = result.title.lower().strip()
-            if normalized_title not in seen_titles:
-                seen_titles.add(normalized_title)
-                unique_results.append(result)
-        
+
+        # Semantic Scholar (short-circuits if already rate-limited)
+        if len(unique_results) < target and "semantic_scholar" in sources and self.semantic_scholar:
+            try:
+                results = self.semantic_scholar.search(query, limit)
+                _add(results)
+                logger.info(f"Semantic Scholar returned {len(results)} results")
+            except Exception as e:
+                logger.warning(f"Semantic Scholar search failed: {e}")
+
+        # ArXiv last (short-circuits if a previous request timed out)
+        if len(unique_results) < target and "arxiv" in sources and self.arxiv:
+            try:
+                results = self.arxiv.search(query, limit)
+                _add(results)
+                logger.info(f"ArXiv returned {len(results)} results")
+            except Exception as e:
+                logger.warning(f"ArXiv search failed: {e}")
+
         return unique_results[:limit * 2]  # Return up to 2x limit after dedup
 
 

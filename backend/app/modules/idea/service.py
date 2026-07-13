@@ -608,7 +608,7 @@ class IdeaGenerationService:
                 ChatMessage(role="user", content=user_prompt)
             ]
             
-            response = client.chat(messages, model=session.config.model, max_tokens=3000)
+            response = client.chat(messages, model=session.config.model, max_tokens=4000)
             
             # Parse ideas from response
             candidates = self._parse_ideas_json(session.id, response.text, max_candidates)
@@ -655,16 +655,71 @@ class IdeaGenerationService:
         
         return inputs, outputs, []
     
+    @staticmethod
+    def _extract_json_payload(text: str) -> Optional[dict]:
+        """Robustly extract a JSON object containing an "ideas" key.
+
+        Handles common LLM formatting issues:
+        - Fenced code blocks (```json ... ```)
+        - Leading/trailing prose around the JSON
+        - Truncated responses (missing closing braces) by trimming to the last
+          complete object/array and retrying.
+        """
+        if not text:
+            return None
+
+        candidates: List[str] = []
+
+        # 1) Fenced code blocks
+        for match in re.finditer(r"```(?:json)?\s*([\s\S]*?)```", text, re.IGNORECASE):
+            candidates.append(match.group(1).strip())
+
+        # 2) Greedy object containing "ideas"
+        greedy = re.search(r'\{[\s\S]*"ideas"[\s\S]*\}', text)
+        if greedy:
+            candidates.append(greedy.group())
+
+        # 3) From the first brace to the end (for truncated responses)
+        first_brace = text.find("{")
+        if first_brace != -1:
+            candidates.append(text[first_brace:])
+
+        for raw in candidates:
+            raw = raw.strip()
+            if not raw:
+                continue
+            # Direct parse
+            try:
+                data = json.loads(raw)
+                if isinstance(data, dict) and "ideas" in data:
+                    return data
+            except json.JSONDecodeError:
+                pass
+            # Retry by trimming to the last complete brace/bracket (truncation)
+            for end_char in ("}", "]"):
+                idx = raw.rfind(end_char)
+                while idx != -1:
+                    snippet = raw[: idx + 1]
+                    # Balance a trailing "ideas" array if the outer object was cut
+                    for closer in ("", "}", "]}", "}]}"):
+                        try:
+                            data = json.loads(snippet + closer)
+                            if isinstance(data, dict) and "ideas" in data:
+                                return data
+                        except json.JSONDecodeError:
+                            continue
+                    idx = raw.rfind(end_char, 0, idx)
+
+        return None
+
     def _parse_ideas_json(self, session_id: str, text: str, max_count: int) -> List[IdeaCandidate]:
         """Parse ideas from JSON response."""
         candidates = []
         
         # Try to extract JSON from response
         try:
-            # Find JSON block
-            json_match = re.search(r'\{[\s\S]*"ideas"[\s\S]*\}', text)
-            if json_match:
-                data = json.loads(json_match.group())
+            data = self._extract_json_payload(text)
+            if data:
                 ideas = data.get("ideas", [])
                 
                 for idea in ideas[:max_count]:
